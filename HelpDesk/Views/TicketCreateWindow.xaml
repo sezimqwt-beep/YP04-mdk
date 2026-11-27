@@ -20,23 +20,11 @@
 
         <TextBlock Grid.Row="0" Text="Новая заявка" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,15"/>
         <TextBlock Grid.Row="2" Text="Категория" Margin="0,0,0,4"/>
-        <ComboBox x:Name="CategoryComboBox" Grid.Row="3" Height="35" FontSize="14" SelectedIndex="0">
-            <ComboBoxItem Content="Выберите категорию" IsEnabled="False"/>
-            <ComboBoxItem Content="Оборудование"/>
-            <ComboBoxItem Content="Программное обеспечение"/>
-            <ComboBoxItem Content="Сеть"/>
-            <ComboBoxItem Content="Учётная запись"/>
-            <ComboBoxItem Content="Периферия"/>
-            <ComboBoxItem Content="Другое"/>
-        </ComboBox>
+        <ComboBox x:Name="CategoryComboBox" Grid.Row="3" Height="35" FontSize="14"/>
         <TextBlock Grid.Row="5" Text="Описание проблемы" Margin="0,12,0,4"/>
         <TextBox x:Name="DescriptionTextBox" Grid.Row="6" Height="110" FontSize="14" TextWrapping="Wrap" AcceptsReturn="True" MaxLength="1000"/>
         <TextBlock Grid.Row="8" Text="Приоритет" Margin="0,12,0,4"/>
-        <ComboBox x:Name="PriorityComboBox" Grid.Row="9" Height="35" FontSize="14" SelectedIndex="1">
-            <ComboBoxItem Content="Низкий"/>
-            <ComboBoxItem Content="Средний"/>
-            <ComboBoxItem Content="Высокий"/>
-        </ComboBox>
+        <ComboBox x:Name="PriorityComboBox" Grid.Row="9" Height="35" FontSize="14"/>
         <StackPanel Grid.Row="10" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,18,0,0">
             <Button x:Name="SaveButton" Content="Сохранить" Width="130" Style="{StaticResource PrimaryButtonStyle}" Click="SaveButton_Click"/>
             <Button x:Name="CancelButton" Content="Отмена" Width="130" IsCancel="True" Style="{StaticResource PrimaryButtonStyle}" Click="CancelButton_Click"/>

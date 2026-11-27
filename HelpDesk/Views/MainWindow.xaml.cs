@@ -1,9 +1,11 @@
-﻿using HelpDesk.Models;
+﻿using HelpDesk.Data;
+using HelpDesk.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+
 using System.Windows.Input;
 
 namespace HelpDesk.Views
@@ -13,24 +15,129 @@ namespace HelpDesk.Views
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<Ticket> tickets;
+        private List<Ticket> tickets = new List<Ticket>();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            tickets = new List<Ticket>
-            {
-                new Ticket { Id = 1, Category = "Сеть", Description = "Нет доступа в Интернет",
-                             Priority = "Высокий", Status = "Новая", CreatedAt = DateTime.Now },
-                new Ticket { Id = 2, Category = "ПО", Description = "Не запускается Microsoft Word",
-                             Priority = "Средний", Status = "В работе", CreatedAt = DateTime.Now },
-                new Ticket { Id = 3, Category = "Оборудование", Description = "Не работает принтер",
-                             Priority = "Низкий", Status = "Выполнена", CreatedAt = DateTime.Now }
-            };
-
             DateTextBlock.Text = "Сегодня: " + DateTime.Today.ToString("dd.MM.yyyy");
+
+            SafeLoadTickets();
+            LoadStatuses();
+        }
+
+        private void LoadTickets()
+        {
+            tickets = new List<Ticket>();
+
+            string sql = @"
+                SELECT
+                    t.Id,
+                    t.UserId,
+                    t.CategoryId,
+                    c.Name AS Category,
+                    t.Description,
+                    t.PriorityId,
+                    p.Name AS Priority,
+                    t.StatusId,
+                    s.Name AS Status,
+                    t.AssignedUserId,
+                    t.CreatedAt,
+                    t.UpdatedAt
+                FROM Tickets t
+                INNER JOIN Categories c ON t.CategoryId = c.Id
+                INNER JOIN Priorities p ON t.PriorityId = p.Id
+                INNER JOIN Statuses s ON t.StatusId = s.Id
+                ORDER BY t.Id DESC;";
+
+            using (SqlConnection connection = Database.GetConnection())
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                connection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Ticket ticket = new Ticket
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            UserId = Convert.ToInt32(reader["UserId"]),
+                            CategoryId = Convert.ToInt32(reader["CategoryId"]),
+                            Category = reader["Category"].ToString(),
+                            Description = reader["Description"].ToString(),
+                            PriorityId = Convert.ToInt32(reader["PriorityId"]),
+                            Priority = reader["Priority"].ToString(),
+                            StatusId = Convert.ToInt32(reader["StatusId"]),
+                            Status = reader["Status"].ToString(),
+                            CreatedAt = Convert.ToDateTime(reader["CreatedAt"])
+                        };
+
+                        if (reader["AssignedUserId"] != DBNull.Value)
+                            ticket.AssignedUserId = Convert.ToInt32(reader["AssignedUserId"]);
+
+                        if (reader["UpdatedAt"] != DBNull.Value)
+                            ticket.UpdatedAt = Convert.ToDateTime(reader["UpdatedAt"]);
+
+                        tickets.Add(ticket);
+                    }
+                }
+            }
+
             ShowTickets(tickets);
+        }
+
+        private void SafeLoadTickets()
+        {
+            try
+            {
+                LoadTickets();
+            }
+            catch (SqlException ex)
+            {
+                TicketsDataGrid.ItemsSource = null;
+
+                MessageBox.Show(
+                    "Не удалось загрузить заявки из базы данных.\n\n" +
+                    "Проверьте SQL Server, имя базы и строку подключения.\n\n" +
+                    ex.Message,
+                    "Ошибка базы данных",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        private void LoadStatuses()
+        {
+            StatusComboBox.Items.Clear();
+            StatusComboBox.Items.Add("Все");
+
+            string sql = "SELECT Name FROM Statuses ORDER BY Id";
+
+            try
+            {
+                using (SqlConnection connection = Database.GetConnection())
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            StatusComboBox.Items.Add(reader["Name"].ToString());
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                MessageBox.Show("Не удалось загрузить статусы:\n" + ex.Message, "Ошибка базы данных",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            StatusComboBox.SelectedIndex = 0;
         }
 
         private void ShowTickets(List<Ticket> list)
@@ -42,8 +149,7 @@ namespace HelpDesk.Views
         private void ApplyFilter()
         {
             string searchText = SearchTextBox.Text.Trim().ToLower();
-            ComboBoxItem item = StatusComboBox.SelectedItem as ComboBoxItem;
-            string status = item == null ? "Все" : item.Content.ToString();
+            string status = StatusComboBox.SelectedItem as string ?? "Все";
 
             var result = tickets
                 .Where(ticket =>
