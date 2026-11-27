@@ -10,11 +10,24 @@ namespace HelpDesk.Views
         public LoginWindow()
         {
             InitializeComponent();
-            Loaded += (s, e) => HelpDesk.Helpers.DemoRunner.Run(this);
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(LoginTextBox.Text))
+            {
+                MessageBox.Show("Введите логин.", "Проверка данных",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(PasswordInput.Password))
+            {
+                MessageBox.Show("Введите пароль.", "Проверка данных",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             string login = LoginTextBox.Text;
             string password = PasswordInput.Password;
 
