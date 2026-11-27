@@ -23,21 +23,7 @@ namespace ClassroomBooking
             BookingDatePicker.SelectedDate = DateTime.Today;
 
             RefreshBookings();
-            Loaded += (s, e) => DemoRunner.Run(this);
         }
-
-        // Члены для автоматической съёмки скриншотов (см. DemoRunner.cs), в обычной работе не используются
-        public void SetInput(int userId, string roomNumber, DateTime date, string start, string end)
-        {
-            UserComboBox.SelectedItem = userService.GetUsers().First(u => u.Id == userId);
-            RoomComboBox.SelectedItem = roomService.GetRooms().First(r => r.Number == roomNumber);
-            BookingDatePicker.SelectedDate = date;
-            StartTimeTextBox.Text = start;
-            EndTimeTextBox.Text = end;
-        }
-        public void Click() => BookButton_Click(null, null);
-        public string Status => StatusTextBlock.Text;
-        public int BookingsCount => bookingService.GetBookings().Count;
 
         private void BookButton_Click(object sender, RoutedEventArgs e)
         {

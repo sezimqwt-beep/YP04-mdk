@@ -10,7 +10,6 @@ namespace HelpDesk.Views
         public LoginWindow()
         {
             InitializeComponent();
-            Loaded += (s, e) => HelpDesk.Helpers.DemoRunner.Run(this);
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
