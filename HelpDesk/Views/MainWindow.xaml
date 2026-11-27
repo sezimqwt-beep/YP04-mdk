@@ -29,7 +29,7 @@
                 <TextBlock Text="Система обработки заявок" FontSize="14" Opacity="0.7" Margin="0,4,0,0"/>
             </StackPanel>
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,15,0">
-                <TextBlock x:Name="CurrentUserTextBlock" Text="Пользователь: admin" FontSize="14" HorizontalAlignment="Right"/>
+                <TextBlock x:Name="CurrentUserTextBlock" Text="Пользователь: —" FontSize="14" HorizontalAlignment="Right"/>
                 <TextBlock x:Name="DateTextBlock" FontSize="12" Opacity="0.7" HorizontalAlignment="Right"/>
             </StackPanel>
             <Button x:Name="LogoutButton" Grid.Column="2" Content="Выйти" VerticalAlignment="Center"

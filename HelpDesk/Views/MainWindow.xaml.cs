@@ -1,4 +1,5 @@
 ﻿using HelpDesk.Data;
+using HelpDesk.Helpers;
 using HelpDesk.Models;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,32 @@ namespace HelpDesk.Views
 
             SafeLoadTickets();
             LoadStatuses();
+        }
+
+        private void ShowCurrentUser()
+        {
+            if (UserSession.CurrentUser == null)
+            {
+                CurrentUserTextBlock.Text = "Пользователь: не определён";
+                return;
+            }
+
+            CurrentUserTextBlock.Text =
+                "Пользователь: " +
+                UserSession.CurrentUser.FullName +
+                " (" + UserSession.CurrentUser.RoleName + ")";
+        }
+
+        private void ApplyRolePermissions()
+        {
+            if (UserSession.CurrentUser == null)
+                return;
+
+            bool isAdmin =
+                UserSession.CurrentUser.RoleName == "Администратор";
+
+            // Учебное правило: удалять заявки может только администратор.
+            DeleteTicketButton.IsEnabled = isAdmin;
         }
 
         private void LoadTickets()
@@ -262,6 +289,8 @@ namespace HelpDesk.Views
             {
                 return;
             }
+
+            UserSession.End();
 
             LoginWindow loginWindow = new LoginWindow();
 
