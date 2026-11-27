@@ -26,6 +26,8 @@ namespace HelpDesk.Views
 
             SafeLoadTickets();
             LoadStatuses();
+            ShowCurrentUser();
+            ApplyRolePermissions();
         }
 
         private void ShowCurrentUser()
